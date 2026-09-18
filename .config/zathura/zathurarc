@@ -1,0 +1,32 @@
+set selection-clipboard "clipboard"
+
+set notification-error-bg       "#e78284"
+set notification-error-fg       "#303446"
+set notification-warning-bg     "#ef9f76"
+set notification-warning-fg     "#303446"
+set notification-bg             "#303446"
+set notification-fg             "#c6d0f5"
+
+set completion-bg               "#292c3c"
+set completion-fg               "#c6d0f5"
+set completion-highlight-bg     "#8ad4ffd"
+set completion-highlight-fg     "#292c3c"
+
+set index-bg                    "#303446"
+set index-fg                    "#c6d0f5"
+set index-active-bg             "#292c3c"
+set index-active-fg             "#c6d0f5"
+
+set inputbar-bg                 "#292c3c"
+set inputbar-fg                 "#c6d0f5"
+set statusbar-bg                "#292c3c"
+set statusbar-fg                "#c6d0f5"
+
+set highlight-color             "rgba(239, 159, 118, 0.3)"  # Laranja bem transparente
+set highlight-active-color      "rgba(140, 160, 243, 0.4)"  # Azul transparente
+set highlight-fg                "#303446"
+
+set default-bg                  "#303446"
+set default-fg                  "#c6d0f5"
+
+set recolor                     "false"

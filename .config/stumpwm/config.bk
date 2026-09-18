@@ -1,0 +1,64 @@
+(run-shell-command "wmname LG3D")
+(which-key-mode)
+(mode-line-mode -1)
+
+; AUTOCOMMANDS
+(run-shell-command "dunst")
+(run-shell-command "~/.fehbg")
+(run-shell-command "xsct 4500 0.8")
+(run-shell-command "pactl set-sink-volume @DEFAULT_SINK@ 100%")
+(run-shell-command "picom")
+(run-shell-command "xscreensaver --no-splash")
+(run-shell-command "xrdb ~/.Xresources")
+; ------------------------------------------------------------
+
+; BASIC
+; change cursor from default X shape
+(run-shell-command "xsetroot -cursor_name left_ptr")
+
+(setf *mouse-focus-policy* :click)
+
+; window modificator
+(setf *float-window-modifier* :super)
+
+; initialize empty frame
+(setf *new-frame-action* :last-window)
+
+(setf *startup-message* nil)
+
+; maxmize the windows
+(setf *ignore-wm-inc-hints* t)
+
+; change gravity
+(setf *message-window-gravity* :top-left
+      *input-window-gravity* :top-left)
+; ------------------------------------------------------------
+
+; MODULES
+; (add-to-load-path
+;   "/home/toilethead/.config/stumpwm/stumpwm-contrib/util/swm-gaps")
+
+; (load-module "swm-gaps")
+;
+; (setf swm-gaps:*inner-gaps-size* 5
+;       swm-gaps:*outer-gaps-size* 5)
+; ------------------------------------------------------------
+
+; KEYS
+(set-prefix-key (kbd "C-ç"))
+
+(define-key *top-map* (kbd "s-ESC") "exec xterm -e htop")
+(define-key *top-map* (kbd "s-F") "exec app.zen_browser.zen")
+(define-key *top-map* (kbd "s-RET") "exec xterm")
+(define-key *top-map* (kbd "s-S-RET") "exec xterm")
+(define-key *top-map* (kbd "s-SunPrint_Screen") "exec org.flameshot.Flameshot gui")
+(define-key *top-map* (kbd "s-T") "exec org.telegram.desktop")
+(define-key *top-map* (kbd "s-V") "exec xterm -e nvim")
+(define-key *top-map* (kbd "s-a") "exec xterm -e qalc")
+(define-key *top-map* (kbd "s-f") "exec io.freetubeapp.FreeTube")
+(define-key *top-map* (kbd "s-t") "exec pcmanfm-qt")
+
+; (define-key *top-map* (kbd "s-u") "toggle-gaps")
+; ------------------------------------------------------------
+
+(echo "started")

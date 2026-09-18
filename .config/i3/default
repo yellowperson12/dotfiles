@@ -1,0 +1,240 @@
+# init ----------------------------------------------------------------------- #
+for_window [class="(?i)alacritty"] floating enable, resize set 500 400, move absolute position center
+for_window [class="(?i)emacs"] floating enable, resize set 1000 550, move absolute position center
+for_window [class="(?i)feh"] floating enable, resize set 500 400, move absolute position center
+for_window [class="(?i)kitty"] floating enable, resize set 500 400, move absolute position center
+for_window [class="(?i)mpv"] floating enable, resize set 500 400, move absolute position center
+for_window [class="(?i)xterm"] floating enable, resize set 500 400, move absolute position center
+
+title_align center
+default_border none
+default_floating_border none
+hide_edge_borders smart
+gaps inner 10
+smart_gaps on
+
+# mod key (Alt=Mod1, Super=Mod4)
+set $mod Mod4
+
+# bindsym shortener
+set $sup bindsym Mod4
+
+# exec shortener
+set $exe        exec --no-startup-id
+set $exe_always exec_always --no-startup-id
+
+# user local bin path (usually '~/bin' or '~/.local/bin')
+set $bin_path ~/.local/bin
+
+# direction keys
+set $uk k
+set $dk j
+set $lk h
+set $rk l
+
+# pulseaudio sink (usually 0 or 1))
+set $pa_sink 0
+
+# session control ------------------------------------------------------------ #
+
+$sup+w   reload
+$sup+Shift+r   restart
+
+# terminal ------------------------------------------------------------------- #
+
+$sup+Return   $exe alacritty
+$sup+Shift+Return   $exe kitty
+
+# focus ---------------------------------------------------------------------- #
+
+focus_follows_mouse no
+focus_wrapping no
+
+$sup+$lk   focus left
+$sup+$dk   focus down
+$sup+$uk   focus up
+$sup+$rk   focus right
+
+$sup+Prior   focus parent
+$sup+Next    focus child
+
+# splitting ------------------------------------------------------------------- #
+
+$sup+semicolon   split toggle
+
+# layout switching ----------------------------------------------------------- #
+
+$sup+slash            layout toggle splitv splith
+$sup+Shift+question   layout toggle all
+$sup+F11              fullscreen toggle
+
+# floating ------------------------------------------------------------------- #
+
+floating_modifier Mod1
+
+$sup+period   floating toggle
+$sup+comma    focus mode_toggle
+
+# moving --------------------------------------------------------------------- #
+
+$sup+Shift+$lk   move left
+$sup+Shift+$dk   move down
+$sup+Shift+$uk   move up
+$sup+Shift+$rk   move right
+
+# resizing ------------------------------------------------------------------- #
+
+$sup+Control $rk   resize grow   width  1 px or 1 ppt
+$sup+Control $lk   resize shrink width  1 px or 1 ppt
+$sup+Control $uk   resize grow   height 1 px or 1 ppt
+$sup+Control $dk   resize shrink height 1 px or 1 ppt
+
+# workspace labels ----------------------------------------------------------- #
+
+set $ws1  "1"
+set $ws2  "2"
+set $ws3  "3"
+set $ws4  "4"
+set $ws5  "5"
+set $ws6  "6"
+set $ws7  "7"
+set $ws8  "8"
+set $ws9  "9"
+set $ws10 "10"
+
+# workspace switching -------------------------------------------------------- #
+
+workspace_auto_back_and_forth yes
+
+$sup+1 workspace $ws1
+$sup+2 workspace $ws2
+$sup+3 workspace $ws3
+$sup+4 workspace $ws4
+$sup+5 workspace $ws5
+$sup+6 workspace $ws6
+$sup+7 workspace $ws7
+$sup+8 workspace $ws8
+$sup+9 workspace $ws9
+$sup+0 workspace $ws10
+
+# moving to workspace -------------------------------------------------------- #
+
+$sup+Shift+1 move container to workspace $ws1
+$sup+Shift+2 move container to workspace $ws2
+$sup+Shift+3 move container to workspace $ws3
+$sup+Shift+4 move container to workspace $ws4
+$sup+Shift+5 move container to workspace $ws5
+$sup+Shift+6 move container to workspace $ws6
+$sup+Shift+7 move container to workspace $ws7
+$sup+Shift+8 move container to workspace $ws8
+$sup+Shift+9 move container to workspace $ws9
+$sup+Shift+0 move container to workspace $ws10
+
+# workspace cycling ---------------------------------------------------------- #
+
+$sup+Right      workspace next
+$sup+Left       workspace prev
+
+# urgent workspace ----------------------------------------------------------- #
+
+$sup+u [urgent=latest] focus
+
+# windows -------------------------------------------------------------------- #
+
+$sup+q   kill
+
+default_border pixel 2
+$sup+Shift+b   border toggle
+
+# colors --------------------------------------------------------------------- #
+
+set $darker   #080910
+set $dark     #181920
+set $black    #2C323E
+set $darkgray #3B4252
+set $gray     #E7E8EB
+set $white    #F5F6F7
+set $red      #BF616A
+set $orange   #DBAB6B
+set $yellow   #EBCB8B
+set $green    #A3BE8C
+set $cyan     #88C0D0
+set $blue     #91B1D1
+set $darkblue #416181
+set $purple   #B48EAD
+
+# appearance ----------------------------------------------------------------- #
+
+font pango:Inconsolata Nerd Font Regular 12
+
+# class                  border  backgr  text       indicator  client_border
+client.focused           $black  $black  $blue      $cyan      $green
+client.unfocused         $darker $darker $darkblue  $cyan      $darker
+client.focused_inactive  $dark   $dark   $darkblue  $cyan      $dark
+client.urgent            $red    $red    $dark      $cyan      $red
+
+# launchers ------------------------------------------------------------------ #
+
+# brave
+$sup+b                  $exe brave
+
+# dmenu
+$sup+apostrophe         $exe dmenu-command
+
+# session logout
+$sup+Shift+q            $exe dmenu-poweroff
+
+# emacs
+$sup+e                  $exe emacs
+
+# firefox...
+$sup+Shift+f            $exe firefox
+
+# freetube
+$sup+f                  $exe freetube
+
+# gmrun
+$sup+Shift+apostrophe   $exe gmrun
+
+# htop
+$sup+Escape             $exe alacritty -e htop
+
+# nitrogen
+$sup+Insert             $exe nitrogen
+
+# pcmanfm
+$sup+t                  $exe pcmanfm
+
+# Polybar, esconder a barra
+$sup+p                  $exe polybar-msg cmd toggle
+
+# qalc
+$sup+a                  $exe alacritty -e qalc
+
+# qalculate
+$sup+Shift+a                  $exe qalculate
+
+# telegram
+$sup+Shift+t            $exe telegram
+
+# vim
+$sup+Shift+v            $exe alacritty -e vim
+
+bindsym XF86AudioRaiseVolume $exe pactl set-sink-volume $pa_sink +5%
+bindsym XF86AudioLowerVolume $exe pactl set-sink-volume $pa_sink -5%
+bindsym XF86AudioMute        $exe pactl set-sink-mute $pa_sink toggle
+
+# session startup ------------------------------------------------------------ #
+
+$exe blueman-applet
+$exe dunst
+$exe_always nitrogen --restore
+$exe nm-applet
+$exe pactl set-sink-volume @DEFAULT_SINK@ 100%
+$exe parcellite
+$exe_always picom
+$exe polybar -r
+$exe xscreensaver --no-splash
+
+
+# ---------------------------------------------------------------------------- #

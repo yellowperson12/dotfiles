@@ -1,0 +1,185 @@
+# ==================================================================
+# VARIABLES
+# mod key (Alt=Mod1, Super=Mod4)
+set $m Mod4
+set $M Mod1
+
+# bindsym Mod4
+set $s bindsym Mod4
+
+# Workspaces
+set $ws1  "1"
+set $ws2  "2"
+set $ws3  "3"
+set $ws4  "4"
+set $ws5  "5"
+set $ws6  "6"
+set $ws7  "7"
+set $ws8  "8"
+set $ws9  "9"
+set $ws10 "10"
+
+# for_window
+set $f for_window
+
+# exec shortener
+set $e  exec
+set $ea exec_always
+
+# floating enable
+set $fe floating enable
+
+# resize set 500 400
+set $rs resize set
+
+# move absolute position center
+set $mc move absolute position center
+
+# user local bin path
+set $bin_path ~/.local/bin
+
+# direction keys
+set $uk k
+set $dk j
+set $lk h
+set $rk l
+
+# pulseaudio sink
+set $pa_sink 0
+# ==================================================================
+
+# GENERAL
+default_border          pixel 2
+default_floating_border none
+hide_edge_borders       smart
+focus_follows_mouse     no
+focus_wrapping          no
+floating_modifier       Mod4
+
+# ==================================================================
+
+# KEYS
+
+# System
+$s+w        reload
+$s+Shift+r  restart
+$s+Shift+q  $e $bin_path/bemenu-poweroff.sh
+$s+$M+b     border toggle
+
+# WINDOW
+$s+q kill
+$s+u [urgent=latest] focus
+
+$s+$lk focus left
+$s+$dk focus down
+$s+$uk focus up
+$s+$rk focus right
+
+$s+Prior focus parent
+$s+Next  focus child
+
+$s+1 workspace $ws1
+$s+2 workspace $ws2
+$s+3 workspace $ws3
+$s+4 workspace $ws4
+$s+5 workspace $ws5
+$s+6 workspace $ws6
+$s+7 workspace $ws7
+$s+8 workspace $ws8
+$s+9 workspace $ws9
+$s+0 workspace $ws10
+
+$s+Shift+1 move container to workspace $ws1
+$s+Shift+2 move container to workspace $ws2
+$s+Shift+3 move container to workspace $ws3
+$s+Shift+4 move container to workspace $ws4
+$s+Shift+5 move container to workspace $ws5
+$s+Shift+6 move container to workspace $ws6
+$s+Shift+7 move container to workspace $ws7
+$s+Shift+8 move container to workspace $ws8
+$s+Shift+9 move container to workspace $ws9
+$s+Shift+0 move container to workspace $ws10
+
+$s+Right workspace next
+$s+Left  workspace prev
+
+$s+semicolon      split      toggle
+$s+slash          layout     toggle splitv splith
+$s+Shift+question layout     toggle all
+$s+F11            fullscreen toggle
+$s+period         floating   toggle
+$s+comma          focus      mode_toggle
+
+$s+Shift+$lk move left
+$s+Shift+$dk move down
+$s+Shift+$uk move up
+$s+Shift+$rk move right
+
+$s+Control+$rk resize grow   width  5px
+$s+Control+$lk resize shrink width  5px
+$s+Control+$uk resize grow   height 5px
+$s+Control+$dk resize shrink height 5px
+
+# APPS
+$s+Return     $e foot
+$s+apostrophe $e bemenu-run
+$s+e          $e emacs
+$s+f          $e io.freetubeapp.FreeTube
+$s+Escape     $e foot -e htop
+$s+t          $e pcmanfm-qt
+$s+a          $e foot -e qalc
+$s+Shift+t    $e org.telegram.desktop
+$s+Print      $e org.flameshot.Flameshot gui
+$s+Shift+v    $e foot -e nvim
+$s+Shift+f    $e app.zen_browser.zen
+
+# Áudio
+bindsym XF86AudioRaiseVolume $e pactl set-sink-volume $pa_sink +5%
+bindsym XF86AudioLowerVolume $e pactl set-sink-volume $pa_sink -5%
+bindsym XF86AudioMute        $e pactl set-sink-mute $pa_sink toggle
+# ==================================================================
+
+# APPEARANCE
+set $darker   #080910
+set $dark     #181920
+set $black    #2C323E
+set $darkgray #3B4252
+set $gray     #E7E8EB
+set $white    #F5F6F7
+set $red      #BF616A
+set $orange   #DBAB6B
+set $yellow   #EBCB8B
+set $green    #A3BE8C
+set $cyan     #88C0D0
+set $blue     #91B1D1
+set $darkblue #416181
+set $purple   #B48EAD
+
+font pango:Inconsolata Nerd Font Regular 8
+
+client.focused           $black  $black  $blue     $cyan  $green
+client.unfocused         $darker $darker $darkblue $cyan  $darker
+client.focused_inactive  $dark   $dark   $darkblue $cyan  $dark
+client.urgent            $red    $red    $dark     $cyan  $red
+
+# WINDOW BEHAVIOR
+$f [class="(?i)xterm"]  $fe, $rs 500  400, $mc
+$f [app_id="(?i)foot"]  $fe, $rs 500  400, $mc
+$f [app_id="(?i)emacs"] $fe, $rs 1000 550, $mc
+$f [app_id="(?i)mpv"]   $fe, $rs 500  400, $mc
+$f [class="(?i)feh"]    $fe, $rs 500  400, $mc
+# ==================================================================
+
+# AUTOCOMMANDS
+exec_always mako
+# exec_always wlsunset -t 6000 -T 8000 &
+exec_always waybar &
+exec_always $bin_path/wallpaper-sway.sh &
+exec_always pactl set-sink-volume @DEFAULT_SINK@ 100%
+exec_always xscreensaver --no-splash &
+
+# CONFIGURAÇÃO DO TECLADO BR
+input "*" {
+    xkb_layout br
+    xkb_variant abnt2
+}

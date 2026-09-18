@@ -1,0 +1,210 @@
+# VARIABLES
+# mod key (Alt=Mod1, Super=Mod4)
+set $m Mod4
+set $M Mod1
+
+# bindsym Mod4
+set $s bindsym Mod4
+
+# for_window
+set $f for_window
+
+# exec shortener
+set $e  exec --no-startup-id
+set $ea exec_always --no-startup-id
+
+# floating enable
+set $fe floating enable
+
+# resize set 500 400
+set $rs resize set
+
+# move absolute position center
+set $mc move absolute position center
+
+# user local bin path (usually '~/bin' or '~/.local/bin')
+set $bin_path ~/.local/bin
+
+# direction keys
+set $uk k
+set $dk j
+set $lk h
+set $rk l
+
+# pulseaudio sink (usually 0 or 1))
+set $pa_sink 0
+# ==================================================================
+
+# GENERAL
+title_align             center
+default_border          none
+default_floating_border none
+hide_edge_borders       smart
+# gaps                    inner 10
+# smart_gaps              on
+focus_follows_mouse     no
+focus_wrapping          no
+floating_modifier       Mod4
+#workspace_auto_back_and_forth yes
+default_border          pixel 2
+# ==================================================================
+
+# KEYS
+
+# System
+# set $s bindsym Mod4
+$s+w       reload
+$s+Shift+r restart
+$s+Shift+q $e $bin_path/dmenu-poweroff.sh
+$s+$M+b border toggle
+
+# WINDOW
+$s+q kill
+$s+u [urgent=latest] focus
+
+$s+$lk focus left
+$s+$dk focus down
+$s+$uk focus up
+$s+$rk focus right
+
+$s+Prior focus parent
+$s+Next  focus child
+
+$s+1 workspace $ws1
+$s+2 workspace $ws2
+$s+3 workspace $ws3
+$s+4 workspace $ws4
+$s+5 workspace $ws5
+$s+6 workspace $ws6
+$s+7 workspace $ws7
+$s+8 workspace $ws8
+$s+9 workspace $ws9
+$s+0 workspace $ws10
+
+$s+Shift+1 move container to workspace $ws1
+$s+Shift+2 move container to workspace $ws2
+$s+Shift+3 move container to workspace $ws3
+$s+Shift+4 move container to workspace $ws4
+$s+Shift+5 move container to workspace $ws5
+$s+Shift+6 move container to workspace $ws6
+$s+Shift+7 move container to workspace $ws7
+$s+Shift+8 move container to workspace $ws8
+$s+Shift+9 move container to workspace $ws9
+$s+Shift+0 move container to workspace $ws10
+
+$s+Right workspace next
+$s+Left  workspace prev
+
+$s+semicolon      split toggle
+$s+slash          layout toggle splitv splith
+$s+Shift+question layout toggle all
+$s+F11            fullscreen toggle
+$s+period         floating toggle
+$s+comma          focus mode_toggle
+
+$s+Shift+$lk move left
+$s+Shift+$dk move down
+$s+Shift+$uk move up
+$s+Shift+$rk move right
+
+$s+Control $rk resize grow   width  1 px or 1 ppt
+$s+Control $lk resize shrink width  1 px or 1 ppt
+$s+Control $uk resize grow   height 1 px or 1 ppt
+$s+Control $dk resize shrink height 1 px or 1 ppt
+
+set $ws1  "1"
+set $ws2  "2"
+set $ws3  "3"
+set $ws4  "4"
+set $ws5  "5"
+set $ws6  "6"
+set $ws7  "7"
+set $ws8  "8"
+set $ws9  "9"
+set $ws10 "10"
+
+# APPS
+# xterm
+$s+Return $e xterm
+
+# dmenu
+$s+apostrophe $e $bin_path/dmenu-command.sh
+
+# emacs
+$s+e $e emacs
+
+# freetube
+$s+f $e io.freetubeapp.FreeTube
+
+# htop
+$s+Escape $e xterm -e htop
+
+# pcmanfm
+$s+t $e pcmanfm-qt
+
+# polybar, hide bar
+$s+b $e polybar-msg cmd toggle
+
+# qalc
+$s+a $e xterm -e qalc
+
+# telegram
+$s+Shift+t $e org.telegram.desktop
+
+# flameshot
+$s+Print $e flameshot gui
+
+# neovim
+$s+Shift+v $e xterm -e nvim
+
+# zen
+$s+Shift+f $e app.zen_browser.zen
+
+bindsym XF86AudioRaiseVolume $e pactl set-sink-volume $pa_sink +5%
+bindsym XF86AudioLowerVolume $e pactl set-sink-volume $pa_sink -5%
+bindsym XF86AudioMute        $e pactl set-sink-mute $pa_sink toggle
+# ==================================================================
+
+# APPEARANCE
+set $darker   #080910
+set $dark     #181920
+set $black    #2C323E
+set $darkgray #3B4252
+set $gray     #E7E8EB
+set $white    #F5F6F7
+set $red      #BF616A
+set $orange   #DBAB6B
+set $yellow   #EBCB8B
+set $green    #A3BE8C
+set $cyan     #88C0D0
+set $blue     #91B1D1
+set $darkblue #416181
+set $purple   #B48EAD
+
+font pango:Inconsolata Nerd Font Regular 8
+
+# class                  border  backgr  text       indicator  client_border
+client.focused           $black  $black  $blue      $cyan      $green
+client.unfocused         $darker $darker $darkblue  $cyan      $darker
+client.focused_inactive  $dark   $dark   $darkblue  $cyan      $dark
+client.urgent            $red    $red    $dark      $cyan      $red
+
+# WINDOW BEHAVIOR
+$f [class="(?i)xterm"]     $fe, $rs 500  400,  $mc
+$f [class="(?i)emacs"] 		$fe, $rs 1000 550,  $mc
+$f [class="(?i)kitty"] 		$fe, $rs 500  400,  $mc
+$f [class="(?i)mpv"] 		$fe, $rs 500  400,  $mc
+$f [class="(?i)feh"] 		$fe, $rs 500  400,  $mc
+$f [class="parcellite"]    $fe, $mc
+# ==================================================================
+
+# AUTOCOMMANDS
+$e  dunst
+$e  ~/.fehbg
+# $e  nm-applet
+$e  xsct 6000 0.8
+$e  pactl set-sink-volume @DEFAULT_SINK@ 100%
+$ea picom
+$e  polybar -r
+$e  xscreensaver --no-splash
+$e  xrdb ~/.Xresources

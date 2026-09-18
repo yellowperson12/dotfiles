@@ -1,0 +1,571 @@
+#+title: My config
+#+startup: overview hideblocks indent
+
+* =init.el= contents
+
+#+begin_example
+(org-babel-load-file
+  (expand-file-name "config.org" user-emacs-directory))
+#+end_example
+
+* General settings
+
+** Interface configuration
+
+#+begin_src emacs-lisp
+  (setq inhibit-startup-message t)
+  (setq-default indent-tabs-mode nil)
+  ;;(set-fringe-mode 10)
+
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (tooltip-mode -1)
+  (electric-indent-mode -1)
+
+  (setq tab-bar-new-tab-choice "*scratch*")
+  (setq dired-kill-when-opening-new-dired-buffer t)
+  (setq vc-follow-synlinks t)
+
+  (recentf-mode 1)
+  (savehist-mode 1)
+
+  (column-number-mode 1)
+  (delete-selection-mode t)
+  (global-auto-revert-mode t)
+  (global-visual-line-mode t)
+  ;; (global-hl-line-mode 1)
+
+  (which-key-mode)
+
+  (fset 'yes-or-no-p 'y-or-n-p)
+
+  ;; (when (display-graphic-p)
+  ;;   (set-frame-parameter nil 'undecorated t))
+#+end_src
+
+** Line numbering
+
+#+begin_src emacs-lisp
+  (setq display-line-numbers-type 'relative)
+  (dolist (mode '(prog-mode-hook
+                  conf-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 1))))
+#+end_src
+
+** Key
+
+#+begin_src emacs-lisp
+  (global-unset-key (kbd "C-z"))
+  ;; (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+  (windmove-default-keybindings)
+  (windmove-swap-states-default-keybindings)
+  (windmove-delete-default-keybindings)
+#+end_src
+
+** Eldoc
+
+#+begin_src elisp
+  (with-eval-after-load 'eldoc
+    (setq eldoc-echo-area-prefer-doc-buffer nil) ; never use *eldoc*
+    (setq eldoc-echo-area-use-multiline-p nil) ; dont open buffer (use echo area)
+    (setq eldoc-echo-area-display-truncation-message nil)
+    (setq eldoc-echo-area-prefer-doc-buffer nil))
+#+end_src
+
+* System
+
+** Backup
+
+#+begin_src emacs-lisp
+  (setq auto-save-default nil
+        backup-inhibited t)
+#+end_src
+
+** Custom settings
+
+#+begin_src emacs-lisp
+  (setq custom-file (locate-user-emacs-file "custom.el"))
+  (load custom-file 'noerror 'nomessage)
+#+end_src
+
+* Fonts
+
+#+begin_src elisp
+  (set-face-attribute 'default nil :font "DejaVu Sans Mono-8")
+#+end_src
+
+* Function
+
+** my/load-theme-clean
+
+Disable all active themes and load a new THEME
+
+#+begin_src emacs-lisp
+  (defun my/load-theme-clean (theme)
+    (interactive
+     (list
+      (intern (completing-read "Load theme: "
+                               (mapcar 'symbol-name
+                                       (custom-available-themes))))))
+    (mapc #'disable-theme custom-enabled-themes)
+    (load-theme theme t))
+#+end_src
+
+** my/toggle-alpha-background
+
+Adjust the transparency current frame's background using alpha-background. If called with a numeric prefix (C-u), prompts for a value (0-100). Otherwise, cycles through the values: 100 (opaque), 85 and 70.
+
+#+begin_src emacs-lisp
+  (defun my/toggle-alpha-background (&optional arg)
+    (interactive "P")
+    (unless (fboundp 'frame-parameter)
+      (error "`frame-parameter' is unavailable"))
+    (let* ((frame (selected-frame))
+           (current (or (frame-parameter frame 'alpha-background) 100))
+           (new-value
+            (cond
+             ((and arg (numberp current))
+              (let ((val (read-number "Background opacity value (0-100): " current)))
+                (if (and (>= val 0) (<= val 100))
+                    val
+                  (error "The value must be between 0 e 100"))))
+             (t
+              (pcase current
+                (100 85)
+                (85 70)
+                (_ 100))))))
+      (condition-case err
+          (progn
+            (set-frame-parameter frame 'alpha-background new-value)
+            (message "alpha-background adjusted to %d%%" new-value))
+        (error
+         (message "Error setting alpha-background: %s" (error-message-string err))))))
+#+end_src
+
+* Package management
+
+** Package's configuration
+
+#+begin_src emacs-lisp
+  (require 'package)
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                           ("elpa" . "https://elpa.gnu.org/packages/")))
+  (package-initialize)
+  (unless package-archive-contents
+    (package-refresh-contents))
+#+end_src
+
+** Use-package configuration
+
+#+begin_src emacs-lisp
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+#+end_src
+
+* Packages
+
+** Evil Mode
+
+#+begin_src emacs-lisp
+  (use-package evil
+    :init
+    (setq evil-want-integration t
+          evil-want-keybinding nil
+          evil-vsplit-window-right t
+          evil-split-window-below t
+          evil-undo-system 'undo-redo))
+
+  (use-package evil-collection
+    :after evil
+    :config
+    (add-to-list 'evil-collection-mode-list 'help)
+    (evil-collection-init))
+
+  (use-package evil-terminal-cursor-changer
+    :ensure t
+    :config
+    (unless (display-graphic-p)
+      (evil-terminal-cursor-changer-activate)))
+#+end_src
+
+** Vterm
+
+Dependencies for compiling.
+
+- ~cmake~
+- ~libtool-bin~
+- ~libvterm-dev~
+
+#+begin_src emacs-lisp
+  (use-package vterm
+    :defer 2
+    :config
+    (setq shell-file-name "/bin/bash"
+          vterm-max-scrollback 5000))
+
+  (use-package vterm-toggle
+    :after vterm
+    :config
+    (setq vterm-toggle-fullscreen-p nil)
+    (setq vterm-toggle-scope 'project)
+    (add-to-list 'display-buffer-alist
+                 '((lambda (buffer-or-name _)
+                     (let ((buffer (get-buffer buffer-or-name)))
+                       (with-current-buffer buffer
+                         (or (equal major-mode 'vterm-mode)
+                             (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
+                   (display-buffer-reuse-window display-buffer-at-bottom)
+                   (reusable-frames . visible)
+                   (window-height . 0.3))))
+#+end_src
+
+** Vertico
+
+#+begin_src emacs-lisp
+  (use-package vertico
+    ;; :bind (:map vertico-map
+    ;;             ("C-f" . vertico-exit)
+    ;;             ("C-j" . vertico-next)
+    ;;             ("C-k" . vertico-previous)
+    ;;             :map minibuffer-local-map
+    ;;             ("M-h" . backward-kill-word))
+    :custom
+    (vertico-cycle t)
+    :init
+    (vertico-mode))
+#+end_src
+
+** Magit
+
+Basic Actions:
+
+- Status Interface: =C-x g=
+- Exit by pressing =q=
+- Reload with the sequence =g r= (=M-x magit-refresh=).
+- Expand/collapse sections by pressing =TAB= on the headings.
+- Expand/collapse the changes (diff) by pressing =TAB= on the files.
+- Pressing the =s= key on a file will stage it for commit.
+- Pressing the =u= key on a file will unstage it for commit.
+- With =S= or =U=, all files are indexed or deindexed.
+- Transient command panel: =?=, =h=, =C-c C-c=.
+- Close by =C-g=
+- Commons Commands: =c= (commit), =P= (push), =F= (pull).
+
+Typical commit sequence:
+
+#+begin_example
+C-x g (status)
+s (stage)
+c (commit) → c (create commit) → C-c C-c (save and exit)
+P (push)
+u (origin/main)
+q (exit status)
+#+end_example
+
+#+begin_src emacs-lisp
+  (use-package magit
+    :defer 2
+    :custom
+    (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+#+end_src
+
+** Treemacs
+
+#+begin_src emacs-lisp
+  (use-package treemacs
+    :ensure t
+    :defer t
+    :bind (("C-\\" . 'treemacs))
+    :config
+    ;; Visual adjustments
+    (setq treemacs-width 33
+          treemacs-indentation 2
+          treemacs-position 'right
+  	;; Use ‘M-x treemacs-select-window’ to bring the window into focus
+          treemacs-is-never-other-window t
+          treemacs-show-hidden-files t)
+    ;; Enable icons (if you have compatible fonts)
+    (when (fboundp 'treemacs-resize-icons)
+      (treemacs-resize-icons 14))
+    :hook
+    (treemacs-mode . treemacs-project-follow-mode))
+#+end_src
+
+Basic actions (in the Treemacs window):
+
+- =C-c C-p a= :: includes a project on the desktop.
+- =C-c C-p d= :: remove the project from the desktop.
+
+#+begin_src emacs-lisp
+  ;; (use-package lsp-treemacs
+  ;;   :after (lsp-mode treemacs)
+  ;;   :ensure t
+  ;;   :config
+  ;;   ;; Opções adicionais (customizáveis)
+  ;;   (setq lsp-treemacs-error-list-current-project t)
+  ;;   (setq lsp-treemacs-sync-mode t))
+#+end_src
+
+Add some interesting links:
+
+- Errors: =M-x lsp-treemacs-errors-list=
+- Symbols: =M-x lsp-treemacs-symbols=
+- References: =M-x lsp-treemacs-references=
+
+** Marginalia
+
+Additional information on selections.
+
+#+begin_src emacs-lisp
+  (use-package marginalia
+    :after vertico
+    :init
+    (marginalia-mode))
+#+end_src
+
+** Orderless
+
+/fuzzy/ buffer in the minibuffer.
+
+#+begin_src emacs-lisp
+  (use-package orderless
+    :config
+    (setq completion-styles '(orderless basic)))
+#+end_src
+
+** Consult
+
+Useful functions:
+
+- consult-buffer :: circulate between open buffers.
+- consult-find :: recursive files search.
+- consult-grep :: recursive grep.
+- consult-line :: search between buffer lines.
+- consult-outline :: search among headers (/outline/).
+
+#+begin_src emacs-lisp
+  (use-package consult
+    :bind (:map global-map
+                ("C-x b" . consult-buffer)))
+#+end_src
+
+** Diminish
+
+#+begin_src emacs-lisp
+  (use-package diminish)
+  (diminish 'which-key-mode "")
+  (diminish 'visual-line-mode "")
+  (diminish 'eldoc-mode "")
+  (diminish 'flyspell-mode "Spell")
+  (diminish 'evil-collection-unimpaired-mode "")
+#+end_src
+
+** Company
+
+#+begin_src emacs-lisp
+  (use-package company
+    :defer 2
+    :diminish
+    :config
+    (global-company-mode 1)
+    :custom
+    (company-begin-commands '(self-insert-command))
+    (company-idle-delay 0.1)
+    (company-minimum-prefix-length 2)
+    (company-show-numbers t)
+    (company-tooltip-align-annotations t)
+    (company-require-match nil)
+    :bind
+    (:map company-active-map
+          ("TAB" . nil)
+          ("<tab>" . nil)
+          ("RET" . company-complete-selection)))
+
+  (use-package company-box
+    :diminish
+    :hook (company-mode . company-box-mode))
+#+end_src
+
+** Languages
+
+*** Web mode
+
+#+begin_src emacs-lisp
+  (use-package web-mode
+    :mode ("\\.phtml\\.tpl\\.html\\.twig\\.html?\\'" . web-mode))
+#+end_src
+
+*** Markdown
+
+To use =pandoc= as command, It must be installed on the system.
+
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :commands (markdown-mode gfm-mode)
+    :mode (("README\\.md\\'" . gfm-mode)
+           ("\\.md\\'" . gfm-mode)
+           ("\\.markdown\\'" . markdown-mode))
+    :init (setq markdown-command "pandoc"))
+
+  (use-package markdown-preview-mode
+    :commands markdown-preview)
+#+end_src
+
+*** Lua Mode
+
+#+begin_src emacs-lisp
+  (use-package lua-mode)
+#+end_src
+
+*** Python mode
+
+#+begin_src emacs-lisp
+  (setenv "PYTHON_BASIC_REPL" "1")
+
+  (use-package python
+    :ensure nil
+    :mode ("\\.py\\'" . python-mode)
+    :interpreter ("python3" . python-mode)
+    :config
+    (setq python-indent-offset 4)
+    (setq indent-tabs-mode nil)
+    (when (treesit-ready-p 'python)
+      (add-to-list 'major-mode-remap-alist
+                   '(python-mode . python-ts-mode))))
+#+end_src
+
+*** Go mode
+
+#+begin_src emacs-lisp
+  (use-package go-mode
+    :ensure t
+    :mode "\\.go\\'")
+#+end_src
+
+*** Sly
+
+#+begin_src emacs-lisp
+  (use-package sly
+    :commands (sly)
+    :hook (lisp-mode . sly)
+    :config (setq inferior-lisp-program "/usr/bin/sbcl"))
+#+end_src
+
+** Org Mode
+
+*** Block Indentation
+
+#+begin_src emacs-lisp
+  (require 'org-tempo)
+#+end_src
+
+*** Org Bullets
+
+#+begin_src emacs-lisp
+  (use-package org-bullets
+    :custom
+    (org-bullets-bullet-list '("▶" "▷" "◆" "◇" "▪" "▪" "▪")))
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+#+end_src
+
+** Centered Window Mode
+
+Centralize windows.
+
+#+begin_src emacs-lisp
+  (use-package centered-window :ensure t)
+#+end_src
+
+** Visual-replace
+
+#+begin_src emacs-lisp
+  (use-package visual-replace
+    :defer t
+    :bind (("C-c r" . visual-replace)
+           :map isearch-mode-map
+           ("C-c r" . visual-replace-from-isearch)))
+#+end_src
+
+** Rainbow Delimiters
+
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :hook ((prog-mode . rainbow-delimiters-mode)
+           ;; (emacs-lisp-mode . rainbow-delimiters-mode)
+           ))
+#+end_src
+
+** Rainbow Mode
+
+#+begin_src emacs-lisp
+  (use-package rainbow-mode
+    :diminish
+    :hook org-mode prog-mode)
+#+end_src
+
+** Flycheck
+
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :init (global-flycheck-mode))
+#+end_src
+
+** LSP Mode
+
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    ;; :hook ((c-mode . lsp)
+    ;;        (python-mode . lsp))
+    :commands lsp
+    :config
+    (setq lsp-clients-clangd-executable "/usr/bin/clangd")
+    (setq lsp-completion-provider :capf)
+    (setq lsp-keymap-prefix "C-c l"))
+
+  (use-package lsp-pyright
+    :ensure t
+    :after lsp-mode
+    :config
+    (setq lsp-pyright-executable "pyright-langserver"))
+#+end_src
+
+** LSP UI
+
+#+begin_src emacs-lisp
+  (use-package lsp-ui
+    :commands lsp-ui-mode
+    :after lsp-mode
+    :hook (lsp-mode . lsp-ui-mode))
+#+end_src
+
+- Display warning messages and erros in the buffer (/sideline/).
+- Symbol Browser: ~lsp-ui-imenu~.
+- Reference Finder: ~lsp-ui-peek-find-references~.
+- Definition Finder: ~lsp-ui-peek-find-definitions~.
+- List of errors and warnings: ~lsp-ui-flycheck~.
+
+* Disabled Packages
+
+** Slime
+
+External file.
+
+#+begin_src emacs-lisp
+;(setq inferior-lisp-program "/usr/bin/sbcl")
+;(add-to-list 'load-path "/usr/share/emacs/site-lisp/slime/")
+;(require 'slime)
+;(slime-setup)
+#+end_src
+
+** Projectile
+
+#+begin_src emacs-lisp
+;(use-package projectile
+;  :diminish projectile-mode
+;  :config
+;  (projectile-mode))
+#+end_src

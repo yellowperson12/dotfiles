@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+wmname LG3D
+pgrep -x dunst || dunst &
+~/.fehbg &
+xsct 4500 0.8
+pactl set-sink-volume @DEFAULT_SINK@ 100%
+pgrep -x picom || picom &
+pgrep -x xscreensaver || xscreensaver --no-splash &
+xrdb ~/.Xresources
